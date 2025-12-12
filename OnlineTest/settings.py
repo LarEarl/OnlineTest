@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     
     'users',
+    'courses',
+    'progress'
 ]
 
 SITE_ID = 1
@@ -190,3 +192,6 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 ACCOUNT_UNIQUE_EMAIL = True
+
+CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672//"
+CELERY_RESULT_BACKEND = 'rpc://'
