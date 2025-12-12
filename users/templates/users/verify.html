@@ -1,0 +1,25 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Подтверждение email - OnlineTest{% endblock %}
+
+{% block content %}
+  <h1>Подтверждение email</h1>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div>
+      <label>Email:</label>
+      <input type="email" name="email" value="{{ email }}" required>
+    </div>
+    <div>
+      <label>Код подтверждения (4 цифры):</label>
+      <input type="text" name="code" maxlength="4" placeholder="0000" required>
+    </div>
+    <button type="submit">Подтвердить</button>
+  </form>
+  <div class="links">
+    <p><a href="{% url 'users:register' %}">Вернуться к регистрации</a></p>
+  </div>
+{% endblock %}

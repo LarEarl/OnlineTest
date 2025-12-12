@@ -6,6 +6,7 @@ from .views import (
     LogoutView,
     ProfileView,
     ProfileEditView,
+    VerifyView,
 )
 
 app_name = 'users'
@@ -13,6 +14,7 @@ app_name = 'users'
 urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
+    path('verify/', VerifyView.as_view(), name='verify'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/edit/', ProfileEditView.as_view(), name='profile_edit'),

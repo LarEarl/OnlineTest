@@ -1,0 +1,17 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Подключение аккаунта - OnlineTest{% endblock %}
+
+{% block content %}
+  <h1>Подключение аккаунта Google</h1>
+  <p>Подключить аккаунт Google к вашему профилю?</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" style="background-color: #27ae60;">Подтвердить подключение</button>
+  </form>
+
+  <div class="links">
+    <p><a href="{% url 'users:profile' %}">Отмена</a></p>
+  </div>
+{% endblock %}

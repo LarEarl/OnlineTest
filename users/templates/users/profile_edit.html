@@ -1,26 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Редактирование профиля</title>
-</head>
-<body>
+{% extends 'users/base.html' %}
+
+{% block title %}Редактирование профиля - OnlineTest{% endblock %}
+
+{% block content %}
   <h1>Редактирование профиля</h1>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+      <div class="error">{{ form.non_field_errors }}</div>
+    {% endif %}
     <div>
       {{ form.email.label_tag }}
       {{ form.email }}
-      {{ form.email.errors }}
+      {% if form.email.errors %}
+        <div class="error">{{ form.email.errors }}</div>
+      {% endif %}
     </div>
     <div>
       {{ form.avatar.label_tag }}
       {{ form.avatar }}
-      {{ form.avatar.errors }}
+      {% if form.avatar.errors %}
+        <div class="error">{{ form.avatar.errors }}</div>
+      {% endif %}
     </div>
     <button type="submit">Сохранить</button>
   </form>
-  <p><a href="{% url 'users:profile' %}">Назад к профилю</a></p>
-</body>
-</html>
+  <div class="links">
+    <p><a href="{% url 'users:profile' %}">Назад к профилю</a></p>
+  </div>
+{% endblock %}

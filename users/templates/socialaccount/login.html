@@ -1,0 +1,26 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Вход через Google - OnlineTest{% endblock %}
+
+{% block content %}
+  <h1>Подтверждение входа</h1>
+  <p>Продолжить вход через Google?</p>
+  
+  {% if account %}
+    <div class="profile-info">
+      <p><strong>Email:</strong> {{ account.user.email }}</p>
+      {% if account.user.first_name %}
+        <p><strong>Имя:</strong> {{ account.user.first_name }} {{ account.user.last_name }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" style="background-color: #27ae60;">Подтвердить и войти</button>
+  </form>
+
+  <div class="links">
+    <p><a href="{% url 'users:login' %}">Отмена</a></p>
+  </div>
+{% endblock %}

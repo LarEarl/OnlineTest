@@ -1,24 +1,31 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Вход</title>
-</head>
-<body>
+{% extends 'users/base.html' %}
+{% load socialaccount %}
+
+{% block title %}Вход - OnlineTest{% endblock %}
+
+{% block content %}
   <h1>Вход</h1>
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
   <form method="post">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+      <div class="error">{{ form.non_field_errors }}</div>
+    {% endif %}
     <div>
       {{ form.identifier.label_tag }}
       {{ form.identifier }}
-      {{ form.identifier.errors }}
+      {% if form.identifier.errors %}
+        <div class="error">{{ form.identifier.errors }}</div>
+      {% endif %}
     </div>
     <div>
       {{ form.password.label_tag }}
       {{ form.password }}
-      {{ form.password.errors }}
+      {% if form.password.errors %}
+        <div class="error">{{ form.password.errors }}</div>
+      {% endif %}
     </div>
     <div>
       {{ form.remember_me }} Запомнить меня
@@ -28,6 +35,15 @@
     {% endif %}
     <button type="submit">Войти</button>
   </form>
-  <p><a href="{% url 'users:register' %}">Регистрация</a></p>
-</body>
-</html>
+
+  <h2>Или войдите через социальные сети</h2>
+  <div class="social-login" style="margin-top: 20px;">
+    <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #db4437; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin-right: 10px;">
+      🔵 Войти через Google
+    </a>
+  </div>
+
+  <div class="links">
+    <p style="margin-top: 20px;">Нет аккаунта? <a href="{% url 'users:register' %}">Зарегистрируйтесь</a></p>
+  </div>
+{% endblock %}
