@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Профиль</title>
+</head>
+<body>
+  <h1>Профиль</h1>
+  <p>Логин: {{ user_obj.username }}</p>
+  <p>Email: {{ user_obj.email }}</p>
+  <p>Роль: {% if user_obj.is_course_admin %}Админ курса{% else %}Студент{% endif %}</p>
+  <p>Дата регистрации: {{ user_obj.date_joined }}</p>
+  {% if user_obj.avatar %}
+    <p><img src="{{ user_obj.avatar.url }}" alt="avatar" width="160"/></p>
+  {% endif %}
+
+  <p>
+    <a href="{% url 'users:profile_edit' %}">Редактировать профиль</a>
+  </p>
+
+  <form method="get" action="{% url 'users:logout' %}">
+    <button type="submit">Выйти</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Редактирование профиля</title>
+</head>
+<body>
+  <h1>Редактирование профиля</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      {{ form.email.label_tag }}
+      {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+    <div>
+      {{ form.avatar.label_tag }}
+      {{ form.avatar }}
+      {{ form.avatar.errors }}
+    </div>
+    <button type="submit">Сохранить</button>
+  </form>
+  <p><a href="{% url 'users:profile' %}">Назад к профилю</a></p>
+</body>
+</html>

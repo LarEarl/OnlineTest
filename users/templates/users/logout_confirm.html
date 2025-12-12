@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Выход</title>
+</head>
+<body>
+  <h1>Подтвердите выход</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+    <button type="submit">Выйти</button>
+    <a href="{% url 'users:profile' %}">Отмена</a>
+  </form>
+</body>
+</html>
