@@ -15,7 +15,8 @@ def modules(request, course_slug):
     user = request.user
     course = Course.objects.get(slug=course_slug)
     open_moduls = get_all_open_modules(user, course) # получаем все открытые модули 
-
+    print(open_moduls)
+    print(user)
     return render(request, 'modules.html', { 'open_moduls': open_moduls })
 
 @login_required()

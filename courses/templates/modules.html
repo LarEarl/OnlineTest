@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Модули курса - OnlineTest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-card:hover {
+            transform: translateX(10px);
+        }
+
+        .module-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .module-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .module-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-unlocked {
+            background: #e7f5e7;
+            color: #2d8f2d;
+        }
+
+        .status-locked {
+            background: #ffe6e6;
+            color: #c92a2a;
+        }
+
+        .module-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .no-modules {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{% url 'courses:all_cources' %}" class="back-link">← Назад к курсам</a>
+
+        <header>
+            <h1>📖 Модули курса</h1>
+        </header>
+
+        {% if open_moduls %}
+        <div class="modules-list">
+            {% for item in open_moduls %}
+            <a href="{% if item.is_open %}{% url 'courses:lessons' item.module.slug %}{% else %}javascript:void(0);{% endif %}"
+                class="module-card {% if not item.is_open %}locked{% endif %}">
+                <div class="module-header">
+                    <h2 class="module-title">{{ item.module.name }}</h2>
+                    <span class="module-status {% if item.is_open %}status-unlocked{% else %}status-locked{% endif %}">
+                        {% if item.is_open %}🔓 Открыт{% else %}🔒 Закрыт{% endif %}
+                    </span>
+                </div>
+                {% if item.module.description %}
+                <p class="module-description">{{ item.module.description }}</p>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-modules">
+            <p>😕 В этом курсе пока нет модулей</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+
+</html>

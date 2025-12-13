@@ -1,0 +1,81 @@
+{% extends 'base_test.html' %}
+
+{% block title %}{{ question.test.title }} - Вопрос {{ question.order }}{% endblock %}
+
+{% block header %}{{ question.test.title }}{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <div class="question-info">
+        <span class="question-number">Вопрос {{ question.order }}</span>
+        <span class="question-type">{{ question.is_code|yesno:"Код,Тест" }}</span>
+    </div>
+
+    <div class="question-text">
+        <h2>{{ question.text|linebreaks }}</h2>
+    </div>
+
+    {% if not question.is_code %}
+    <!-- Quiz вопрос -->
+    <form id="quiz-form" class="quiz-form" data-question-id="{{ question.id }}">
+        {% csrf_token %}
+        <div class="options-container">
+            {% for option in question.options.all %}
+            <label class="option-label">
+                <input type="radio" name="user_answer" value="{{ option.id }}" required>
+                <span class="option-text">{{ option.text }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Ответить</button>
+    </form>
+
+    <div id="quiz-result" class="result-message" style="display: none;"></div>
+    {% else %}
+    <!-- Code вопрос -->
+    <form id="code-form" class="code-form" data-question-id="{{ question.id }}">
+        {% csrf_token %}
+        <div class="code-editor-container">
+            <label for="code-input">Ваш код:</label>
+            <textarea id="code-input" name="code" rows="15" placeholder="# Введите ваш Python код здесь..."
+                required></textarea>
+        </div>
+        <div class="code-buttons">
+            <button type="submit" class="btn btn-primary" id="submit-code-btn">Отправить код</button>
+            <button type="button" class="btn btn-secondary" id="reedit-code-btn" style="display: none;">Редактировать
+                код</button>
+        </div>
+    </form>
+
+    <div id="code-result" class="result-message" style="display: none;">
+        <div class="status-indicator">
+            <span id="status-text">Проверка...</span>
+            <div class="spinner"></div>
+        </div>
+        <div id="execution-output" style="display: none;">
+            <h3>Результат выполнения:</h3>
+            <div id="stdout-container" class="output-container"></div>
+            <div id="stderr-container" class="error-container"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="navigation-buttons">
+        <div class="nav-left">
+            {% if question.order > 1 %}
+            <a href="{% url 'tests_app:lesson_test' question.test.lesson.id question.order|add:'-1' %}"
+                class="btn btn-secondary">← Предыдущий</a>
+            {% endif %}
+        </div>
+
+        <div class="nav-right">
+            {% if question.order < question.test.questions.count %} <a
+                href="{% url 'tests_app:lesson_test' question.test.lesson.id question.order|add:'1' %}"
+                class="btn btn-secondary">Следующий →</a>
+                {% else %}
+                <button id="finish-test-btn" class="btn btn-primary" data-question-id="{{ question.id }}">Завершить тест</button>
+                {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

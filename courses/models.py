@@ -19,7 +19,6 @@ class Module(models.Model):
     description = models.TextField(blank=True)
     slug = models.SlugField(max_length=100, unique=True)
     order = models.PositiveIntegerField(default=0)  # порядок отображения
-    is_locked_by_default = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['order']

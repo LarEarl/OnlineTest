@@ -40,4 +40,5 @@ def module_unlock_check(sender, instance, created,**kwargs):
             
             next_module_progress.is_unlocked = True
             next_module_progress.save(update_fields=['is_unlocked'])
+            print('signal сработал и все гуд')
         
