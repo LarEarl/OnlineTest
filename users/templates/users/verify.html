@@ -7,6 +7,9 @@
   {% if error %}
     <div class="error">{{ error }}</div>
   {% endif %}
+  {% if success %}
+    <div class="success">{{ success }}</div>
+  {% endif %}
   <form method="post">
     {% csrf_token %}
     <div>
@@ -17,8 +20,18 @@
       <label>Код подтверждения (4 цифры):</label>
       <input type="text" name="code" maxlength="4" placeholder="0000" required>
     </div>
-    <button type="submit">Подтвердить</button>
+    <button type="submit" name="action" value="verify">Подтвердить</button>
   </form>
+
+  <div class="links">
+    <p style="margin-top: 20px;">Не получили код?</p>
+    <form method="post" action="{% url 'users:resend_code' %}" style="display: inline;">
+      {% csrf_token %}
+      <input type="hidden" name="email" value="{{ email }}">
+      <button type="submit" style="background-color: #f39c12;">Отправить код еще раз</button>
+    </form>
+  </div>
+
   <div class="links">
     <p><a href="{% url 'users:register' %}">Вернуться к регистрации</a></p>
   </div>

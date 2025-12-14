@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
-	email = models.EmailField(unique=True)
+	email = models.EmailField()
 	is_course_admin = models.BooleanField(default=False)
 	avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 

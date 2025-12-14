@@ -7,6 +7,7 @@ from .views import (
     ProfileView,
     ProfileEditView,
     VerifyView,
+    ResendVerificationCodeView,
 )
 
 app_name = 'users'
@@ -15,6 +16,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
     path('verify/', VerifyView.as_view(), name='verify'),
+    path('verify/resend/', ResendVerificationCodeView.as_view(), name='resend_code'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/edit/', ProfileEditView.as_view(), name='profile_edit'),

@@ -13,12 +13,6 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ['username', 'email']
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Этот email уже зарегистрирован.')
-        return email
-
     def clean(self):
         cleaned = super().clean()
         pwd1 = cleaned.get('password1')
@@ -47,16 +41,3 @@ class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email', 'avatar']
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        qs = User.objects.filter(email=email)
-        if self.user:
-            qs = qs.exclude(pk=self.user.pk)
-        if qs.exists():
-            raise forms.ValidationError('Этот email уже используется.')
-        return email
