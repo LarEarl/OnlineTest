@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Учительская - Модули{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>📖 Управление модулями</h1>
+  <p style="color:#7f8c8d; margin-bottom:15px;">Укажите курс, название, порядок и slug.</p>
+
+  <form method="post" style="margin-bottom:25px; background:#f8f9fa; padding:20px; border-radius:8px;">
+    {% csrf_token %}
+    {% if form.errors %}
+      <div class="error">{{ form.non_field_errors }}
+        {% for field in form %}
+          {% for err in field.errors %}
+            <div>{{ field.label }}: {{ err }}</div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div>{{ form.course.label_tag }}{{ form.course }}</div>
+    <div>{{ form.name.label_tag }}{{ form.name }}</div>
+    <div>{{ form.description.label_tag }}{{ form.description }}</div>
+    <div>{{ form.slug.label_tag }}{{ form.slug }}</div>
+    <div>{{ form.order.label_tag }}{{ form.order }}</div>
+    <button type="submit">Создать модуль</button>
+  </form>
+
+  <h2>Список модулей</h2>
+  <div class="modules-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;">
+    {% for module in modules %}
+    <div class="module-card" style="background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+      <h3 style="color:#2c3e50;">{{ module.name }}</h3>
+      <p style="color:#7f8c8d; font-size:0.95em;">Курс: {{ module.course.title }}</p>
+      <p style="color:#95a5a6; font-size:0.85em;">Порядок: {{ module.order }}</p>
+      <p style="color:#95a5a6; font-size:0.85em;">slug: {{ module.slug }}</p>
+      <a href="{% url 'teacher_app:module_edit' module.pk %}" style="color:#2980b9; font-size:0.9em;">Редактировать</a>
+    </div>
+    {% empty %}
+    <p>Пока нет модулей.</p>
+    {% endfor %}
+  </div>
+</div>
+<script>
+const translitMap = {
+  'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
+  'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'E','Ж':'Zh','З':'Z','И':'I','Й':'Y','К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'H','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch','Ъ':'','Ы':'Y','Ь':'','Э':'E','Ю':'Yu','Я':'Ya'
+};
+function transliterate(text) {
+  return text.split('').map(c => translitMap[c] || c).join('');
+}
+function generateSlug(text) {
+  return transliterate(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+const nameInput = document.querySelector('[name="name"]');
+const slugInput = document.querySelector('[name="slug"]');
+if (nameInput && slugInput) {
+  nameInput.addEventListener('input', function() {
+    if (!slugInput.dataset.edited) {
+      slugInput.value = generateSlug(this.value);
+    }
+  });
+  slugInput.addEventListener('input', function() {
+    this.dataset.edited = 'true';
+  });
+}
+</script>
+{% endblock %}

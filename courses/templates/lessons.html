@@ -1,160 +1,120 @@
-<!DOCTYPE html>
-<html lang="ru">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Уроки модуля - OnlineTest</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block title %}Уроки модуля - OnlineTest{% endblock %}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+{% block extra_css %}
+<style>
+    .back-link {
+        display: inline-block;
+        color: #3498db;
+        text-decoration: none;
+        margin-bottom: 20px;
+        padding: 8px 15px;
+        background: #ecf0f1;
+        border-radius: 5px;
+        transition: background 0.3s;
+    }
+    .back-link:hover {
+        background: #bdc3c7;
+    }
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .lessons-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .lesson-card {
+        background: white;
+        border-radius: 8px;
+        padding: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+    .lesson-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    }
+    .lesson-info {
+        flex: 1;
+    }
+    .lesson-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+    .lesson-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .lesson-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: bold;
+    }
+    .badge-video {
+        background: #d6eaf8;
+        color: #2980b9;
+    }
+    .badge-test {
+        background: #fdebd0;
+        color: #f39c12;
+    }
+    .lesson-arrow {
+        font-size: 1.5em;
+        color: #3498db;
+    }
+    .no-lessons {
+        text-align: center;
+        font-size: 1.2em;
+        color: #666;
+        padding: 50px 20px;
+    }
+</style>
+{% endblock %}
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+{% block content %}
+<div class="container">
+    <a href="javascript:history.back()" class="back-link">← Назад к модулям</a>
 
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .back-link {
-            display: inline-block;
-            color: white;
-            text-decoration: none;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            transition: background 0.3s;
-        }
-
-        .back-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .lessons-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .lesson-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .lesson-card:hover {
-            transform: translateX(10px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .lesson-info {
-            flex: 1;
-        }
-
-        .lesson-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .lesson-meta {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .lesson-badge {
-            padding: 3px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: bold;
-        }
-
-        .badge-video {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .badge-test {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .lesson-arrow {
-            font-size: 1.5em;
-            color: #667eea;
-        }
-
-        .no-lessons {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            margin-top: 50px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <a href="javascript:history.back()" class="back-link">← Назад к модулям</a>
-
-        <header>
-            <h1>📝 Уроки модуля</h1>
-        </header>
-
-        {% if open_lessons %}
-        <div class="lessons-list">
-            {% for item in open_lessons %}
-            <a href="{% url 'courses:lesson' item.lesson.id %}" class="lesson-card">
-                <div class="lesson-info">
-                    <h2 class="lesson-title">{{ item.lesson.title }}</h2>
-                    <div class="lesson-meta">
-                        {% if item.lesson.video_url %}
-                        <span class="lesson-badge badge-video">🎥 Видео</span>
-                        {% endif %}
-                        {% if item.lesson.has_test %}
-                        <span class="lesson-badge badge-test">✍️ Тест</span>
-                        {% endif %}
-                    </div>
-                </div>
-                <span class="lesson-arrow">→</span>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="no-lessons">
-            <p>😕 В этом модуле пока нет уроков</p>
-        </div>
-        {% endif %}
+    <div class="page-header">
+        <h1>📝 Уроки модуля</h1>
     </div>
-</body>
 
-</html>
+    {% if open_lessons %}
+    <div class="lessons-list">
+        {% for item in open_lessons %}
+        <a href="{% url 'courses:lesson' item.lesson.id %}" class="lesson-card">
+            <div class="lesson-info">
+                <h2 class="lesson-title">{{ item.lesson.title }}</h2>
+                <div class="lesson-meta">
+                    {% if item.lesson.video_url %}
+                    <span class="lesson-badge badge-video">🎥 Видео</span>
+                    {% endif %}
+                    {% if item.lesson.has_test %}
+                    <span class="lesson-badge badge-test">✍️ Тест</span>
+                    {% endif %}
+                </div>
+            </div>
+            <span class="lesson-arrow">→</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-lessons">
+        <p>😕 В этом модуле пока нет уроков</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

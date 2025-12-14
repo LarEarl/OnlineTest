@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Учительская - Тесты{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Управление тестами</h1>
+  <p style="color:#7f8c8d; margin-bottom:15px;">Шаги: создайте тест → добавьте вопросы → варианты ответов.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;">
+    <form method="post" style="background:#f8f9fa; padding:20px; border-radius:8px;">
+      {% csrf_token %}
+      <h3 style="margin-bottom:10px;">Создать тест</h3>
+      {{ test_form.non_field_errors }}
+      <div>{{ test_form.lesson.label_tag }}{{ test_form.lesson }}</div>
+      <div>{{ test_form.title.label_tag }}{{ test_form.title }}</div>
+      <div>{{ test_form.description.label_tag }}{{ test_form.description }}</div>
+      <button type="submit">Создать тест</button>
+    </form>
+
+    <form method="post" style="background:#f8f9fa; padding:20px; border-radius:8px;">
+      {% csrf_token %}
+      <h3 style="margin-bottom:10px;">Добавить вопрос</h3>
+      {{ question_form.non_field_errors }}
+      <div>{{ question_form.test.label_tag }}{{ question_form.test }}</div>
+      <div>{{ question_form.text.label_tag }}{{ question_form.text }}</div>
+      <div>{{ question_form.is_code.label_tag }}{{ question_form.is_code }}</div>
+      <div>{{ question_form.order.label_tag }}{{ question_form.order }}</div>
+      <button type="submit">Добавить вопрос</button>
+    </form>
+
+    <form method="post" style="background:#f8f9fa; padding:20px; border-radius:8px;">
+      {% csrf_token %}
+      <h3 style="margin-bottom:10px;">Добавить ответ</h3>
+      {{ answer_form.non_field_errors }}
+      <div>{{ answer_form.question.label_tag }}{{ answer_form.question }}</div>
+      <div>{{ answer_form.text.label_tag }}{{ answer_form.text }}</div>
+      <div>{{ answer_form.is_correct.label_tag }}{{ answer_form.is_correct }}</div>
+      <button type="submit">Добавить ответ</button>
+    </form>
+  </div>
+
+  <h2 style="margin-top:25px;">Существующие тесты</h2>
+  <div class="modules-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;">
+    {% for test in tests %}
+    <div class="module-card" style="background:#fff;border-radius:8px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+      <h3 style="color:#2c3e50;">{{ test.title }}</h3>
+      <p style="color:#7f8c8d; font-size:0.95em;">Урок: {{ test.lesson.title }}</p>
+      <p style="color:#95a5a6; font-size:0.85em;">Вопросов: {{ test.questions.count }}</p>
+      <a href="{% url 'teacher_app:test_edit' test.pk %}" style="color:#2980b9; font-size:0.9em;">Редактировать</a>
+    </div>
+    {% empty %}
+    <p>Пока нет тестов.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

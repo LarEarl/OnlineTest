@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Редактировать урок{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Редактирование урока: {{ lesson.title }}</h1>
+  <form method="post" style="margin-top:15px; background:#f8f9fa; padding:20px; border-radius:8px;">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>{{ form.module.label_tag }}{{ form.module }}</div>
+    <div>{{ form.title.label_tag }}{{ form.title }}</div>
+    <div>{{ form.content.label_tag }}{{ form.content }}</div>
+    <div>{{ form.video_url.label_tag }}{{ form.video_url }}</div>
+    <div>{{ form.order.label_tag }}{{ form.order }}</div>
+    <div>{{ form.has_test.label_tag }}{{ form.has_test }}</div>
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'teacher_app:lessons' %}" style="margin-left:10px;">Отмена</a>
+  </form>
+</div>
+{% endblock %}

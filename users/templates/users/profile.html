@@ -1,24 +1,274 @@
-{% extends 'users/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Профиль - OnlineTest{% endblock %}
 
-{% block content %}
-  <h1>Профиль</h1>
-  <div class="profile-info">
-    {% if user_obj.avatar %}
-      <img src="{{ user_obj.avatar.url }}" alt="avatar" class="avatar"/>
-    {% else %}
-      <p><em>Аватар не загружен</em></p>
-    {% endif %}
-    <p><strong>Логин:</strong> {{ user_obj.username }}</p>
-    <p><strong>Email:</strong> {{ user_obj.email }}</p>
-    <p><strong>Роль:</strong> {% if user_obj.is_course_admin %}Админ курса{% else %}Студент{% endif %}</p>
-    <p><strong>Дата регистрации:</strong> {{ user_obj.date_joined|date:"d.m.Y" }}</p>
-  </div>
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .profile-avatar-section {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .profile-avatar-large {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 4px solid white;
+    }
+    .profile-avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4em;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .profile-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .profile-card h2 {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+    }
+    .profile-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    .profile-info-item {
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+    .profile-info-label {
+        font-weight: bold;
+        color: #7f8c8d;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .profile-info-value {
+        font-size: 1.1em;
+        color: #2c3e50;
+    }
+    .profile-actions {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .profile-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: bold;
+    }
+    .badge-admin {
+        background: #fdebd0;
+        color: #f39c12;
+    }
+    .badge-student {
+        background: #d6eaf8;
+        color: #2980b9;
+    }
+    
+    /* Level Progress Bar */
+    .level-section {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .level-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .level-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .level-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .level-text h3 {
+        margin: 0;
+        font-size: 1.2em;
+        color: #2c3e50;
+    }
+    .level-text p {
+        margin: 5px 0 0 0;
+        color: #7f8c8d;
+        font-size: 0.9em;
+    }
+    .xp-info {
+        text-align: right;
+    }
+    .xp-current {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #667eea;
+    }
+    .xp-needed {
+        font-size: 0.9em;
+        color: #7f8c8d;
+    }
+    .level-progress-bar {
+        background: #ecf0f1;
+        border-radius: 20px;
+        height: 25px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .level-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        transition: width 0.5s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9em;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    }
+</style>
+{% endblock %}
 
-  <div class="links">
-    <a href="{% url 'users:profile_edit' %}" class="btn">Редактировать профиль</a>
-    <a href="{% url 'users:password_change' %}" class="btn">Сменить пароль</a>
-    <a href="{% url 'users:logout' %}" class="btn">Выйти</a>
-  </div>
+{% block content %}
+<div class="container profile-container">
+    <div class="profile-header">
+        <h1>Мой профиль</h1>
+    </div>
+    
+    <div class="profile-avatar-section">
+        {% if user_obj.avatar %}
+            <img src="{{ user_obj.avatar.url }}" alt="Аватар" class="profile-avatar-large"/>
+        {% else %}
+            <div class="profile-avatar-placeholder">
+                {{ user_obj.username|first|upper }}
+            </div>
+        {% endif %}
+        <h2 style="margin-top: 15px; color: #2c3e50;">
+            {% if user_obj.first_name or user_obj.last_name %}
+                {{ user_obj.first_name }} {{ user_obj.last_name }}
+            {% else %}
+                {{ user_obj.username }}
+            {% endif %}
+        </h2>
+        <span class="profile-badge {% if user_obj.is_course_admin %}badge-admin{% else %}badge-student{% endif %}">
+            {% if user_obj.is_course_admin %}Администратор{% else %}Студент{% endif %}
+        </span>
+    </div>
+
+    <!-- Level Progress Section -->
+    <div class="level-section">
+        <div class="level-header">
+            <div class="level-info">
+                <div class="level-badge">
+                    {{ user_obj.level }}
+                </div>
+                <div class="level-text">
+                    <h3>Уровень {{ user_obj.level }}</h3>
+                    <p>{% if user_obj.level == 0 %}Новичок{% elif user_obj.level < 5 %}Ученик{% elif user_obj.level < 10 %}Знаток{% elif user_obj.level < 20 %}Эксперт{% else %}Мастер{% endif %}</p>
+                </div>
+            </div>
+            <div class="xp-info">
+                <div class="xp-current">{{ user_obj.xp }} XP</div>
+                <div class="xp-needed">/ {{ user_obj.get_xp_for_next_level }} XP</div>
+            </div>
+        </div>
+        <div class="level-progress-bar">
+            <div class="level-progress-fill" style="width: {{ user_obj.get_xp_progress_percent }}%">
+                {{ user_obj.get_xp_progress_percent }}%
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <h2>Информация</h2>
+        <div class="profile-info-grid">
+            <div class="profile-info-item">
+                <div class="profile-info-label">Логин</div>
+                <div class="profile-info-value">{{ user_obj.username }}</div>
+            </div>
+            
+            <div class="profile-info-item">
+                <div class="profile-info-label">Email</div>
+                <div class="profile-info-value">{{ user_obj.email }}</div>
+            </div>
+            
+            {% if user_obj.first_name %}
+            <div class="profile-info-item">
+                <div class="profile-info-label">Имя</div>
+                <div class="profile-info-value">{{ user_obj.first_name }}</div>
+            </div>
+            {% endif %}
+            
+            {% if user_obj.last_name %}
+            <div class="profile-info-item">
+                <div class="profile-info-label">Фамилия</div>
+                <div class="profile-info-value">{{ user_obj.last_name }}</div>
+            </div>
+            {% endif %}
+            
+            <div class="profile-info-item">
+                <div class="profile-info-label">Дата регистрации</div>
+                <div class="profile-info-value">{{ user_obj.date_joined|date:"d.m.Y H:i" }}</div>
+            </div>
+            
+            <div class="profile-info-item">
+                <div class="profile-info-label">Статус</div>
+                <div class="profile-info-value">
+                    {% if user_obj.is_active %}
+                        <span style="color: #27ae60;">Онлайн</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">Офлайн</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-actions">
+        <a href="{% url 'users:profile_edit' %}" class="btn">⚙️ Редактировать профиль</a>
+        <a href="{% url 'users:logout' %}" class="btn btn-secondary">🚪 Выйти</a>
+    </div>
+</div>
 {% endblock %}

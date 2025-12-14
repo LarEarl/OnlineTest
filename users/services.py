@@ -14,5 +14,7 @@ def authenticate_identifier_password(identifier: str, password: str) -> Optional
         return None
     user = User.objects.filter(Q(username__iexact=identifier) | Q(email__iexact=identifier)).first()
     if user and user.check_password(password):
+        # Устанавливаем backend атрибут для совместимости с login()
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         return user
     return None

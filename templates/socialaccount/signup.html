@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация через соцсети - OnlineTest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Завершение регистрации</h1>
+  
+  <p style="color:#7f8c8d; margin-bottom:20px;">
+    Вы входите через <strong>{{ account.provider|title }}</strong>. 
+    Пожалуйста, завершите регистрацию.
+  </p>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    <div class="profile-info">
+      {% if account.extra_data.email %}
+        <p><strong>Email:</strong> {{ account.extra_data.email }}</p>
+      {% endif %}
+      {% if account.extra_data.name %}
+        <p><strong>Имя:</strong> {{ account.extra_data.name }}</p>
+      {% endif %}
+    </div>
+    
+    {{ form.as_p }}
+    
+    <button type="submit" class="btn-success">Завершить регистрацию</button>
+  </form>
+  
+  <div class="links" style="margin-top:15px;">
+    <p><a href="{% url 'users:login' %}">Отмена</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -4,6 +4,7 @@ from .views import *
 app_name = 'tests_app'
 
 urlpatterns = [
+    path('', test_list, name='test_list'),
     path('lesson_test/<int:lesson_id>/<int:question_order>/', lesson_test, name='lesson_test'),
     path('answer_question/<int:question_id>/', answer_question, name='answer_question'),
     path('answer_code/<int:question_id>/', answer_code, name='answer_code'),

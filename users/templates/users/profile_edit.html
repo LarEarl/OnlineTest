@@ -1,31 +1,204 @@
-{% extends 'users/base.html' %}
+  {% extends 'base.html' %}
 
 {% block title %}Редактирование профиля - OnlineTest{% endblock %}
 
+{% block extra_css %}
+<style>
+    .profile-edit-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .form-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    .form-section h2 {
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #34495e;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
+    .form-group input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    .form-group input[type="file"] {
+        padding: 8px;
+        border: 2px dashed #ddd;
+        border-radius: 6px;
+        width: 100%;
+        cursor: pointer;
+    }
+    .avatar-preview {
+        margin-top: 10px;
+        text-align: center;
+    }
+    .avatar-preview img {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .help-text {
+        font-size: 0.85em;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+    .btn-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    .btn-primary {
+        background: #3498db;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .btn-primary:hover {
+        background: #2980b9;
+    }
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.3s;
+    }
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-  <h1>Редактирование профиля</h1>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-      <div class="error">{{ form.non_field_errors }}</div>
-    {% endif %}
-    <div>
-      {{ form.email.label_tag }}
-      {{ form.email }}
-      {% if form.email.errors %}
-        <div class="error">{{ form.email.errors }}</div>
-      {% endif %}
-    </div>
-    <div>
-      {{ form.avatar.label_tag }}
-      {{ form.avatar }}
-      {% if form.avatar.errors %}
-        <div class="error">{{ form.avatar.errors }}</div>
-      {% endif %}
-    </div>
-    <button type="submit">Сохранить</button>
-  </form>
-  <div class="links">
-    <p><a href="{% url 'users:profile' %}">Назад к профилю</a></p>
-  </div>
+<div class="container profile-edit-container">
+    <h1>⚙️ Редактирование профиля</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        
+        <!-- Основная информация -->
+        <div class="form-section">
+            <h2>Основная информация</h2>
+            
+            <div class="form-group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.first_name.label_tag }}
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                <div class="error">{{ form.first_name.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.last_name.label_tag }}
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                <div class="error">{{ form.last_name.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Аватар -->
+        <div class="form-section">
+            <h2>🖼️ Аватар</h2>
+            
+            <div class="form-group">
+                {{ form.avatar.label_tag }}
+                {% if user.avatar %}
+                <div class="avatar-preview">
+                    <p style="margin-bottom: 10px;">Текущий аватар:</p>
+                    <img src="{{ user.avatar.url }}" alt="Аватар">
+                </div>
+                {% endif %}
+                {{ form.avatar }}
+                <p class="help-text">Максимальный размер файла: 5MB. Форматы: JPG, PNG, GIF</p>
+                {% if form.avatar.errors %}
+                <div class="error">{{ form.avatar.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Смена пароля -->
+        <div class="form-section">
+            <h2>Смена пароля</h2>
+            <p class="help-text" style="margin-bottom: 15px;">
+                Оставьте поля пустыми, если не хотите менять пароль
+            </p>
+            
+            <div class="form-group">
+                {{ form.old_password.label_tag }}
+                {{ form.old_password }}
+                {% if form.old_password.errors %}
+                <div class="error">{{ form.old_password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.new_password1.label_tag }}
+                {{ form.new_password1 }}
+                {% if form.new_password1.errors %}
+                <div class="error">{{ form.new_password1.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.new_password2.label_tag }}
+                {{ form.new_password2 }}
+                {% if form.new_password2.errors %}
+                <div class="error">{{ form.new_password2.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <button type="submit" class="btn-primary">Сохранить изменения</button>
+            <a href="{% url 'users:profile' %}" class="btn-secondary">❌ Отмена</a>
+        </div>
+    </form>
+</div>
 {% endblock %}

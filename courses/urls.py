@@ -4,6 +4,7 @@ from .views import *
 app_name = 'courses'
 
 urlpatterns = [
+    path('', all_cources, name='course_list'),
     path('all_cources/', all_cources , name='all_cources'),
     path('modules/<str:course_slug>/', modules, name='modules'),
     path('lessons/<str:modul_slug>/', lessons, name='lessons'),

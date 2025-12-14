@@ -1,5 +1,6 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from courses.models import Lesson
 from tests_app.models import *
 from django.http import JsonResponse
@@ -9,12 +10,25 @@ from django.contrib.auth.decorators import login_required
 from progress.services  import complete_lesson
 # Create your views here.
 def lesson_test(request, lesson_id, question_order):
-    lesson = Lesson.objects.get(id=lesson_id)
+    lesson = get_object_or_404(Lesson, id=lesson_id)
     test = lesson.tests.first()
-    question = Question.objects.get(
-        test=test,
-        order=question_order
-    )
+    
+    if not test:
+        # Если теста нет, показываем сообщение
+        return render(request, 'tests_app/no_test.html', {
+            'lesson': lesson,
+            'error': 'Для этого урока ещё не создан тест.'
+        })
+    
+    try:
+        question = Question.objects.get(test=test, order=question_order)
+    except Question.DoesNotExist:
+        # Если вопроса с таким порядком нет, показываем ошибку
+        return render(request, 'tests_app/no_test.html', {
+            'lesson': lesson,
+            'error': f'Вопрос #{question_order} не найден в этом тесте.'
+        })
+    
     # отдаём страничку с вопросо заранее получив вопрос по lesson_id и question_order - это типа порядок вопроса
     return render(request,'lesson_test.html', { 'question': question })
 
@@ -139,13 +153,25 @@ def finish_test(request, question_id):
         
         # Проверяем что все вопросы отвечены и правильны
         if all_correct and answered_count == all_questions.count():
-            complete_lesson(user, lesson=test.lesson)
-            return JsonResponse(
-                {
-                    'message': f'Поздравляем! Тест пройден ({answered_count}/{all_questions.count()})!',
-                    'status': 'success'
+            result = complete_lesson(user, lesson=test.lesson)
+            
+            response_data = {
+                'message': f'Поздравляем! Тест пройден ({answered_count}/{all_questions.count()})!',
+                'status': 'success'
+            }
+            
+            # Если курс завершен, сохраняем в сессию и добавляем в ответ
+            if result.get('course_completed'):
+                request.session['completed_course_id'] = result.get('course_id')
+                request.session['completed_course_data'] = {
+                    'xp_gained': result.get('xp_gained', 100),
+                    'level_up': result.get('level_up', False),
+                    'new_level': result.get('new_level', 0)
                 }
-            )
+                response_data['course_completed'] = True
+                response_data['course_id'] = result.get('course_id')
+            
+            return JsonResponse(response_data)
         else:
             return JsonResponse(
                 {
@@ -153,3 +179,34 @@ def finish_test(request, question_id):
                     'status': 'failed'
                 }
             )
+
+@login_required
+def test_list(request):
+    """Список всех доступных тестов"""
+    if not request.user.is_authenticated:
+        return redirect('users:login')
+    
+    # Получаем все уроки с тестами, которые пользователь уже завершил или может пройти
+    from progress.models import LessonProgress
+    
+    lesson_progresses = LessonProgress.objects.filter(
+        user=request.user
+    ).select_related('lesson__module__course').prefetch_related('lesson__tests')
+    
+    available_tests = []
+    for progress in lesson_progresses:
+        lesson = progress.lesson
+        test = lesson.tests.first()
+        if test:
+            available_tests.append({
+                'lesson': lesson,
+                'test': test,
+                'progress': progress,
+                'course': lesson.module.course,
+                'module': lesson.module
+            })
+    
+    return render(request, 'tests_app/test_list.html', {
+        'title': 'Тесты',
+        'available_tests': available_tests
+    })

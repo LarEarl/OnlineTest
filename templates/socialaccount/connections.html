@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Подключенные аккаунты - OnlineTest{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Подключенные социальные сети</h1>
+  
+  {% if social_accounts %}
+    <div style="margin:20px 0;">
+      {% for account in social_accounts %}
+        <div class="card">
+          <h3>{{ account.provider|title }}</h3>
+          <p><strong>ID:</strong> {{ account.uid }}</p>
+          {% if account.extra_data.email %}
+            <p><strong>Email:</strong> {{ account.extra_data.email }}</p>
+          {% endif %}
+          <form method="post" action="{% url 'socialaccount_connections' %}" style="margin-top:10px;">
+            {% csrf_token %}
+            <input type="hidden" name="account" value="{{ account.id }}">
+            <button type="submit" name="action" value="disconnect" class="btn-danger" onclick="return confirm('Отключить этот аккаунт?')">
+              Отключить
+            </button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color:#7f8c8d;">У вас нет подключенных социальных сетей.</p>
+  {% endif %}
+  
+  <h2 style="margin-top:30px;">Подключить новый аккаунт</h2>
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin-top:15px;">
+    {% load socialaccount %}
+    {% get_providers as socialaccount_providers %}
+    {% for provider in socialaccount_providers %}
+      <a href="{% provider_login_url provider.id %}" class="btn">
+        Подключить {{ provider.name }}
+      </a>
+    {% endfor %}
+  </div>
+  
+  <div class="links" style="margin-top:20px;">
+    <p><a href="{% url 'users:profile' %}">← Вернуться в профиль</a></p>
+  </div>
+</div>
+{% endblock %}

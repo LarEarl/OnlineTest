@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OnlineTest{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">OnlineTest</a>
+
+      <button class="menu-toggle" aria-label="Меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      {% if user.is_authenticated %}
+      <div class="nav-left">
+        <div class="nav-links">
+          <a href="{% url 'courses:course_list' %}">Курсы</a>
+          <a href="{% url 'tests_app:test_list' %}">Тесты</a>
+          <a href="{% url 'progress:my_progress' %}">Мой прогресс</a>
+          {% if user.is_course_admin %}
+            <a href="{% url 'teacher_app:dashboard' %}">Учительская</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+          <span class="user-info">{{ user.username }}</span>
+          <a href="{% url 'users:profile' %}">Профиль</a>
+          <a href="{% url 'users:logout' %}">Выход</a>
+        {% else %}
+          <a href="{% url 'users:login' %}">Вход</a>
+          <a href="{% url 'users:register' %}">Регистрация</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>&copy; 2025 OnlineTest. Все права защищены.</p>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

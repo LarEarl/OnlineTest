@@ -145,8 +145,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        // Можно перенаправить пользователя
-                        window.location.href = '/courses/all_cources';
+                        
+                        // Если курс завершен, сохраняем в sessionStorage для показа достижения
+                        if (data.course_completed) {
+                            sessionStorage.setItem('completedCourse', data.course_name);
+                        }
+                        
+                        // Перенаправляем на страницу прогресса, если курс завершен, иначе на курсы
+                        if (data.course_completed) {
+                            window.location.href = '/progress/my/';
+                        } else {
+                            window.location.href = '/courses/';
+                        }
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -203,7 +213,7 @@ function checkCodeStatusById(attemptId) {
 
                     if (data.is_correct) {
                         resultDiv.className = 'result-message result-success';
-                        document.getElementById('status-text').textContent = '✅ Код выполнен успешно!';
+                        document.getElementById('status-text').textContent = 'Код выполнен успешно!';
                     } else {
                         resultDiv.className = 'result-message result-error';
                         document.getElementById('status-text').textContent = '❌ Код содержит ошибки';

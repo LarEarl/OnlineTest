@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'users',
     'courses',
     'progress',
-    'tests_app'
+    'tests_app',
+    'teacher_app'
 ]
 
 SITE_ID = 1
@@ -143,6 +144,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media files (user avatars)
 MEDIA_URL = '/media/'
@@ -171,11 +173,6 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         },
-        'APP': {
-            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
-            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
-            'key': ''
-        }
     }
 }
 

@@ -9,9 +9,51 @@ class User(AbstractUser):
 	email = models.EmailField()
 	is_course_admin = models.BooleanField(default=False)
 	avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+	level = models.IntegerField(default=0)
+	xp = models.IntegerField(default=0)
 
 	def __str__(self) -> str:
 		return self.username
+	
+	def get_xp_for_next_level(self):
+		"""Возвращает необходимое количество XP для следующего уровня (последовательность Фибоначчи)"""
+		if self.level == 0:
+			return 100
+		elif self.level == 1:
+			return 200
+		elif self.level == 2:
+			return 300
+		else:
+			# Для уровней 3+ используем последовательность Фибоначчи: 500, 800, 1300, 2100...
+			fib_prev_prev = 300
+			fib_prev = 500
+			for i in range(3, self.level + 1):
+				fib_current = fib_prev_prev + fib_prev
+				fib_prev_prev = fib_prev
+				fib_prev = fib_current
+			return fib_prev
+	
+	def add_xp(self, amount):
+		"""Добавляет XP и автоматически повышает уровень при достижении порога"""
+		self.xp += amount
+		
+		while True:
+			xp_needed = self.get_xp_for_next_level()
+			if self.xp >= xp_needed:
+				self.xp -= xp_needed
+				self.level += 1
+			else:
+				break
+		
+		self.save()
+		return self.level
+	
+	def get_xp_progress_percent(self):
+		"""Возвращает прогресс в процентах до следующего уровня"""
+		xp_needed = self.get_xp_for_next_level()
+		if xp_needed == 0:
+			return 100
+		return int((self.xp / xp_needed) * 100)
 
 
 class ActivationCode(models.Model):

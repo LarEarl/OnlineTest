@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Тест недоступен - OnlineTest{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        text-align: center;
+        padding: 50px 20px;
+    }
+    .error-icon {
+        font-size: 5em;
+        margin-bottom: 20px;
+    }
+    .error-message {
+        font-size: 1.3em;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    .help-text {
+        color: #999;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="error-container">
+        <div class="error-icon">❌</div>
+        <h1>Тест недоступен</h1>
+        
+        {% if lesson %}
+        <p class="error-message">
+            Урок: <strong>{{ lesson.title }}</strong>
+        </p>
+        {% endif %}
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <p class="help-text">
+            Тест для этого урока ещё не создан или находится в разработке.
+        </p>
+        
+        <div style="margin-top: 30px;">
+            {% if lesson %}
+            <a href="{% url 'courses:lesson' lesson.id %}" class="btn">← Вернуться к уроку</a>
+            {% endif %}
+            <a href="{% url 'courses:course_list' %}" class="btn btn-secondary">К курсам</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

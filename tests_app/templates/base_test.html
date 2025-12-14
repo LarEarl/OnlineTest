@@ -1,29 +1,12 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Тест{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'tests_app/css/test_styles.css' %}">
-    {% block extra_css %}{% endblock %}
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>{% block header %}Онлайн тестирование{% endblock %}</h1>
-        </header>
-        
-        <main>
-            {% block content %}{% endblock %}
-        </main>
-        
-        <footer>
-            <p>&copy; 2024 OnlineTest</p>
-        </footer>
-    </div>
-    
-    <script src="{% static 'tests_app/js/test_handler.js' %}"></script>
-    {% block extra_js %}{% endblock %}
-</body>
-</html>
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tests_app/css/test_styles.css' %}">
+{{ block.super }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'tests_app/js/test_handler.js' %}"></script>
+{{ block.super }}
+{% endblock %}

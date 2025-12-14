@@ -233,6 +233,10 @@ class ProfileEditView(View):
 	def post(self, request):
 		form = ProfileEditForm(request.POST, request.FILES, instance=request.user, user=request.user)
 		if form.is_valid():
-			form.save()
+			user = form.save()
+			# Если пароль был изменен, нужно обновить сессию
+			if form.cleaned_data.get('new_password1'):
+				from django.contrib.auth import update_session_auth_hash
+				update_session_auth_hash(request, user)
 			return redirect(reverse('users:profile'))
 		return render(request, 'users/profile_edit.html', {'form': form})

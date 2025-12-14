@@ -2,10 +2,10 @@
 
 {% block title %}{{ question.test.title }} - Вопрос {{ question.order }}{% endblock %}
 
-{% block header %}{{ question.test.title }}{% endblock %}
-
 {% block content %}
-<div class="test-container">
+<div class="container">
+    <h1>{{ question.test.title }}</h1>
+    <div class="test-container">
     <div class="question-info">
         <span class="question-number">Вопрос {{ question.order }}</span>
         <span class="question-type">{{ question.is_code|yesno:"Код,Тест" }}</span>
@@ -77,5 +77,6 @@
                 {% endif %}
         </div>
     </div>
+</div>
 </div>
 {% endblock %}
