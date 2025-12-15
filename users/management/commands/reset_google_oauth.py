@@ -1,13 +1,24 @@
+import os
+from dotenv import load_dotenv
 from django.core.management.base import BaseCommand
 from allauth.socialaccount.models import SocialApp
 from django.contrib.sites.models import Site
-import os
+
+load_dotenv()
 
 
 class Command(BaseCommand):
     help = 'Полная очистка и пересоздание Google OAuth'
 
     def handle(self, *args, **options):
+        # Get credentials from environment
+        client_id = os.getenv('GOOGLE_OAUTH_CLIENT_ID', '')
+        secret = os.getenv('GOOGLE_OAUTH_SECRET_KEY', '')
+        
+        if not client_id or not secret:
+            self.stdout.write(self.style.ERROR('⚠ GOOGLE_OAUTH_CLIENT_ID и GOOGLE_OAUTH_SECRET_KEY не установлены в .env'))
+            return
+        
         # Удаляем ВСЕ Google приложения
         google_apps = SocialApp.objects.filter(provider='google')
         count = google_apps.count()
@@ -22,19 +33,11 @@ class Command(BaseCommand):
         self.stdout.write(f'Текущий сайт: {site.domain}')
         
         # Создаём ОДНО новое приложение
-        client_id = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
-        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
-
-        if not client_id or not client_secret:
-            self.stdout.write(self.style.ERROR('❌ Переменные окружения GOOGLE_OAUTH_CLIENT_ID/GOOGLE_OAUTH_CLIENT_SECRET не заданы'))
-            self.stdout.write(self.style.WARNING('Установите их в окружении перед запуском команды.'))
-            return
-
         google_app = SocialApp.objects.create(
             provider='google',
             name='Google OAuth',
             client_id=client_id,
-            secret=client_secret,
+            secret=secret,
         )
         google_app.sites.add(site)
         
