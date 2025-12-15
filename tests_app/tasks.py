@@ -1,9 +1,25 @@
 from celery import shared_task
 from subprocess import Popen, PIPE, TimeoutExpired
-import tempfile
-from .models import CodeAttempt, CodeTestCase
-import sys
 from django.utils.timezone import now
+import ast
+
+from .models import CodeAttempt
+
+
+def parse_by_type(value: str, data_type: str):
+    value = value.strip()
+
+    if data_type in ('int', 'float', 'bool'):
+        return ast.literal_eval(value)
+
+    if data_type in ('list', 'tuple', 'dict'):
+        return ast.literal_eval(value)
+
+    if data_type == 'str':
+        return value
+
+    return value
+
 
 @shared_task(bind=True, time_limit=10)
 def run_code_task(self, code_attempt_id):
@@ -16,11 +32,10 @@ def run_code_task(self, code_attempt_id):
 
             stdin = attempt.code
             if case.input_data:
-                stdin += "\n" + case.input_data
+                stdin += "\n###INPUT###\n" + case.input_data
 
-            # Добавляем 2 секунды на запуск Docker контейнера
             docker_timeout = case.time_limit + 3.0
-            
+
             process = Popen(
                 [
                     "docker", "run", "--rm", "-i",
@@ -50,20 +65,28 @@ def run_code_task(self, code_attempt_id):
                 attempt.is_correct = False
                 break
 
-            if stdout.strip() != case.expected_output.strip():
+            try:
+                user_output = parse_by_type(stdout, case.expected_output_type)
+                expected_output = parse_by_type(
+                    case.expected_output,
+                    case.expected_output_type
+                )
+            except Exception as e:
+                attempt.status = 'failed'
+                attempt.stderr = f'Output parse error: {e}'
+                attempt.is_correct = False
+                break
+
+            if user_output != expected_output:
                 attempt.status = 'failed'
                 attempt.stdout = stdout
                 attempt.is_correct = False
                 break
+
         else:
             attempt.status = 'success'
             attempt.is_correct = True
             attempt.stdout = stdout
-
-    except TimeoutExpired:
-        attempt.status = 'failed'
-        attempt.stderr = 'Time limit exceeded'
-        attempt.is_correct = False
 
     except Exception as e:
         attempt.status = 'failed'
@@ -73,5 +96,3 @@ def run_code_task(self, code_attempt_id):
     finally:
         attempt.finished_at = now()
         attempt.save()
-
-

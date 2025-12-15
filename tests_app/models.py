@@ -81,11 +81,36 @@ class CodeAttempt(models.Model):
         return f"CodeAttempt: {self.user} - {self.question.id} ({self.status})"
 
 
+
+
+class IODataType(models.TextChoices):
+    STRING = 'string', 'String'
+    INTEGER = 'int', 'Integer'
+    FLOAT = 'float', 'Float'
+    BOOLEAN = 'bool', 'Boolean'
+    LIST = 'list', 'List'
+    TUPLE = 'tuple', 'Tuple'
+    DICT = 'dict', 'Dictionary'
+    NONE = 'none', 'None'
+    RAW = 'raw', 'Raw text (no parsing)'
+
+
+
 class CodeTestCase(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="code_cases")
     input_data = models.TextField(blank=True)
+    input_data_type = models.CharField(
+        max_length=10,
+        choices=IODataType.choices,
+        default=IODataType.RAW
+    )
     expected_output = models.TextField()
-    time_limit = models.FloatField(default=1.0)  # seconds
+    expected_output_type = models.CharField(
+        max_length=10,
+        choices=IODataType.choices,
+        default=IODataType.RAW
+    )
+    time_limit = models.FloatField(default=1.0) 
 
     def __str__(self):
         return f"CodeTestCase for {self.question.id}"

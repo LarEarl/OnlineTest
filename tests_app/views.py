@@ -36,10 +36,8 @@ def lesson_test(request, lesson_id, question_order):
 def answer_code(request, question_id): # ednpoint для js AJAX если тип вопроса code (Создат очередь для выполнения задачи)
     if request.method == 'POST':
         question = Question.objects.get(id=question_id)
-
         if not question.is_code:
             return JsonResponse({'message': 'Not a code question'}, status=400)
-
         code = request.POST.get('code')
 
         # Используем create() чтобы пользователь мог отправлять код много раз
