@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from allauth.socialaccount.models import SocialApp
 from django.contrib.sites.models import Site
+import os
 
 
 class Command(BaseCommand):
@@ -21,12 +22,19 @@ class Command(BaseCommand):
         self.stdout.write(f'Текущий сайт: {site.domain}')
         
         # Создаём ОДНО новое приложение
-        # ВАЖНО: Замените YOUR_CLIENT_ID и YOUR_CLIENT_SECRET на реальные значения
+        client_id = os.environ.get('GOOGLE_OAUTH_CLIENT_ID')
+        client_secret = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET')
+
+        if not client_id or not client_secret:
+            self.stdout.write(self.style.ERROR('❌ Переменные окружения GOOGLE_OAUTH_CLIENT_ID/GOOGLE_OAUTH_CLIENT_SECRET не заданы'))
+            self.stdout.write(self.style.WARNING('Установите их в окружении перед запуском команды.'))
+            return
+
         google_app = SocialApp.objects.create(
             provider='google',
             name='Google OAuth',
-            client_id='YOUR_CLIENT_ID',  # Укажите свой Client ID из Google Cloud Console
-            secret='YOUR_CLIENT_SECRET',  # Укажите свой Client Secret
+            client_id=client_id,
+            secret=client_secret,
         )
         google_app.sites.add(site)
         

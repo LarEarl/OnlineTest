@@ -1,6 +1,6 @@
 from django import forms
 from courses.models import Course, Module, Lesson
-from tests_app.models import Test, Question, AnswerOption
+from tests_app.models import Test, Question, AnswerOption, CodeTestCase
 
 
 class CourseForm(forms.ModelForm):
@@ -83,4 +83,20 @@ class AnswerOptionEditForm(forms.ModelForm):
         fields = ['text', 'is_correct']
         widgets = {
             'text': forms.TextInput(attrs={'placeholder': 'Текст ответа'}),
+        }
+
+
+class CodeTestCaseForm(forms.ModelForm):
+    class Meta:
+        model = CodeTestCase
+        fields = ['input_data', 'expected_output', 'time_limit']
+        widgets = {
+            'input_data': forms.Textarea(attrs={'placeholder': '10\n20', 'rows': 3}),
+            'expected_output': forms.Textarea(attrs={'placeholder': '30', 'rows': 3}),
+            'time_limit': forms.NumberInput(attrs={'value': 1.0, 'step': 0.1, 'min': 0.1}),
+        }
+        labels = {
+            'input_data': 'Входные данные (stdin)',
+            'expected_output': 'Ожидаемый результат (stdout)',
+            'time_limit': 'Лимит времени (секунды)',
         }

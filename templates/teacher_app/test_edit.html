@@ -64,7 +64,66 @@
             </div>
           {% else %}
             <div style="margin-top:12px;padding:12px;background:#fef5e7;border-radius:6px;border:1px solid #f39c12;">
-              <p style="color:#d68910;font-size:0.9em;">Код-вопрос: проверяется автоматически через тест-кейсы</p>
+              <h4 style="color:#d68910;font-size:0.9em;margin-bottom:10px;">Тест-кейсы для проверки кода:</h4>
+              {% for test_case in question.code_cases.all %}
+                <form method="post" style="padding:10px;margin:8px 0;background:#fff;border:1px solid #f39c12;border-radius:4px;">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="edit_test_case">
+                  <input type="hidden" name="test_case_id" value="{{ test_case.id }}">
+                  
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+                    <div>
+                      <label style="font-size:0.85em;color:#7f8c8d;display:block;margin-bottom:4px;">Входные данные (stdin):</label>
+                      <textarea name="input_data" rows="2" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:0.9em;">{{ test_case.input_data }}</textarea>
+                    </div>
+                    <div>
+                      <label style="font-size:0.85em;color:#7f8c8d;display:block;margin-bottom:4px;">Ожидаемый вывод (stdout):</label>
+                      <textarea name="expected_output" rows="2" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:0.9em;">{{ test_case.expected_output }}</textarea>
+                    </div>
+                  </div>
+                  
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                      <label style="font-size:0.85em;color:#7f8c8d;margin-right:6px;">Лимит времени:</label>
+                      <input type="number" name="time_limit" value="{{ test_case.time_limit }}" step="0.1" min="0.1" style="width:80px;padding:4px;border:1px solid #ddd;border-radius:4px;">
+                      <span style="font-size:0.85em;color:#7f8c8d;margin-left:4px;">сек</span>
+                    </div>
+                    <div style="display:flex;gap:5px;">
+                      <button type="submit" style="padding:4px 10px;background:#27ae60;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.85em;">Сохранить</button>
+                      <button type="submit" name="action" value="delete_test_case" onclick="return confirm('Удалить тест-кейс?')" style="padding:4px 10px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.85em;">Удалить</button>
+                    </div>
+                  </div>
+                </form>
+              {% empty %}
+                <p style="color:#e67e22;font-size:0.85em;margin:8px 0;">Тест-кейсов пока нет</p>
+              {% endfor %}
+              
+              <form method="post" style="margin-top:12px;padding:10px;background:#fff;border:2px dashed #f39c12;border-radius:4px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_test_case">
+                <input type="hidden" name="question_id" value="{{ question.id }}">
+                <h5 style="color:#e67e22;font-size:0.9em;margin-bottom:8px;">Добавить новый тест-кейс:</h5>
+                
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+                  <div>
+                    <label style="font-size:0.85em;color:#7f8c8d;display:block;margin-bottom:4px;">Входные данные:</label>
+                    <textarea name="input_data" rows="2" placeholder="5&#10;10" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:0.9em;"></textarea>
+                  </div>
+                  <div>
+                    <label style="font-size:0.85em;color:#7f8c8d;display:block;margin-bottom:4px;">Ожидаемый вывод:</label>
+                    <textarea name="expected_output" rows="2" placeholder="15" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:0.9em;"></textarea>
+                  </div>
+                </div>
+                
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <label style="font-size:0.85em;color:#7f8c8d;margin-right:6px;">Лимит времени:</label>
+                    <input type="number" name="time_limit" value="1.0" step="0.1" min="0.1" style="width:80px;padding:4px;border:1px solid #ddd;border-radius:4px;">
+                    <span style="font-size:0.85em;color:#7f8c8d;margin-left:4px;">сек</span>
+                  </div>
+                  <button type="submit" style="padding:6px 15px;background:#e67e22;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.85em;font-weight:bold;">+ Добавить тест-кейс</button>
+                </div>
+              </form>
             </div>
           {% endif %}
         </div>

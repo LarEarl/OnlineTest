@@ -3,11 +3,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 
 from courses.models import Course, Module, Lesson
-from tests_app.models import Test, Question, AnswerOption
+from tests_app.models import Test, Question, AnswerOption, CodeTestCase
 from users.models import User
 from progress.models import LessonProgress
 
-from .forms import CourseForm, ModuleForm, LessonForm, TestForm, QuestionForm, AnswerOptionForm
+from .forms import CourseForm, ModuleForm, LessonForm, TestForm, QuestionForm, AnswerOptionForm, CodeTestCaseForm
 
 
 def teacher_required(view_func):
@@ -83,24 +83,41 @@ def lessons_manage(request):
 @teacher_required
 def tests_manage(request):
     if request.method == 'POST':
-        test_form = TestForm(request.POST)
-        question_form = QuestionForm(request.POST)
-        answer_form = AnswerOptionForm(request.POST)
-
-        if test_form.is_valid():
-            test = test_form.save()
-            messages.success(request, 'Тест создан')
-            return redirect('teacher_app:tests')
-        elif question_form.is_valid():
-            question = question_form.save()
-            messages.success(request, 'Вопрос добавлен')
-            return redirect('teacher_app:tests')
-        elif answer_form.is_valid():
-            answer_form.save()
-            messages.success(request, 'Ответ добавлен')
-            return redirect('teacher_app:tests')
+        # Проверяем, это запрос на добавление тест-кейса
+        if request.POST.get('add_test_case'):
+            question_id = request.POST.get('test_case_question')
+            if question_id:
+                question = get_object_or_404(Question, id=question_id, is_code=True)
+                CodeTestCase.objects.create(
+                    question=question,
+                    input_data=request.POST.get('test_case_input', ''),
+                    expected_output=request.POST.get('test_case_output', ''),
+                    time_limit=float(request.POST.get('test_case_time_limit', 1.0))
+                )
+                messages.success(request, 'Тест-кейс добавлен')
+                return redirect('teacher_app:tests')
+            else:
+                messages.error(request, 'Выберите вопрос для тест-кейса')
         else:
-            messages.error(request, 'Исправьте ошибки формы')
+            # Обработка обычных форм
+            test_form = TestForm(request.POST)
+            question_form = QuestionForm(request.POST)
+            answer_form = AnswerOptionForm(request.POST)
+
+            if test_form.is_valid():
+                test = test_form.save()
+                messages.success(request, 'Тест создан')
+                return redirect('teacher_app:tests')
+            elif question_form.is_valid():
+                question = question_form.save()
+                messages.success(request, 'Вопрос добавлен')
+                return redirect('teacher_app:tests')
+            elif answer_form.is_valid():
+                answer_form.save()
+                messages.success(request, 'Ответ добавлен')
+                return redirect('teacher_app:tests')
+            else:
+                messages.error(request, 'Исправьте ошибки формы')
     else:
         test_form = TestForm()
         question_form = QuestionForm()
@@ -213,9 +230,38 @@ def test_edit(request, pk):
             option.delete()
             messages.success(request, 'Ответ удален')
             return redirect('teacher_app:test_edit', pk=pk)
+        
+        elif action == 'add_test_case':
+            question_id = request.POST.get('question_id')
+            question = get_object_or_404(Question, id=question_id, test=test)
+            CodeTestCase.objects.create(
+                question=question,
+                input_data=request.POST.get('input_data', ''),
+                expected_output=request.POST.get('expected_output', ''),
+                time_limit=float(request.POST.get('time_limit', 1.0))
+            )
+            messages.success(request, 'Тест-кейс добавлен')
+            return redirect('teacher_app:test_edit', pk=pk)
+        
+        elif action == 'edit_test_case':
+            test_case_id = request.POST.get('test_case_id')
+            test_case = get_object_or_404(CodeTestCase, id=test_case_id)
+            test_case.input_data = request.POST.get('input_data', '')
+            test_case.expected_output = request.POST.get('expected_output', '')
+            test_case.time_limit = float(request.POST.get('time_limit', 1.0))
+            test_case.save()
+            messages.success(request, 'Тест-кейс обновлен')
+            return redirect('teacher_app:test_edit', pk=pk)
+        
+        elif action == 'delete_test_case':
+            test_case_id = request.POST.get('test_case_id')
+            test_case = get_object_or_404(CodeTestCase, id=test_case_id)
+            test_case.delete()
+            messages.success(request, 'Тест-кейс удален')
+            return redirect('teacher_app:test_edit', pk=pk)
     
     form = TestForm(instance=test)
-    questions = test.questions.prefetch_related('options').order_by('order')
+    questions = test.questions.prefetch_related('options', 'code_cases').order_by('order')
     
     return render(request, 'teacher_app/test_edit.html', {
         'form': form,

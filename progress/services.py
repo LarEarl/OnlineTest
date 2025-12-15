@@ -71,6 +71,7 @@ def complete_lesson(user, lesson):
     
     course_completed = False
     completed_course_name = None
+    completed_course_id = None
     
     # Проверяем, завершены ли все уроки в модуле
     module = lesson.module
@@ -139,4 +140,4 @@ def complete_lesson(user, lesson):
         'course_completed': course_completed,
         'course_name': completed_course_name,
         'course_id': completed_course_id
-    } 
+    }

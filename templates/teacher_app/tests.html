@@ -36,6 +36,36 @@
       <div>{{ answer_form.is_correct.label_tag }}{{ answer_form.is_correct }}</div>
       <button type="submit">Добавить ответ</button>
     </form>
+
+    <form method="post" style="background:#fef5e7; padding:20px; border-radius:8px; border-left:4px solid #f39c12;">
+      {% csrf_token %}
+      <h3 style="margin-bottom:10px; color:#d68910;">Добавить тест-кейс</h3>
+      <p style="color:#e67e22; font-size:0.85em; margin-bottom:10px;">Для code вопросов</p>
+      <div>
+        <label style="font-size:0.9em; color:#7f8c8d;">Выберите вопрос (code):</label>
+        <select name="test_case_question" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+          <option value="">-- Выберите вопрос --</option>
+          {% for question in questions %}
+            {% if question.is_code %}
+            <option value="{{ question.id }}">{{ question.test.title }} - {{ question.text|truncatewords:5 }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:0.9em; color:#7f8c8d; display:block; margin-top:8px;">Входные данные (stdin):</label>
+        <textarea name="test_case_input" placeholder="5&#10;10" rows="2" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-family:monospace; font-size:0.85em;"></textarea>
+      </div>
+      <div>
+        <label style="font-size:0.9em; color:#7f8c8d; display:block; margin-top:8px;">Ожидаемый вывод (stdout):</label>
+        <textarea name="test_case_output" placeholder="15" rows="2" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px; font-family:monospace; font-size:0.85em;"></textarea>
+      </div>
+      <div style="margin-top:8px;">
+        <label style="font-size:0.9em; color:#7f8c8d; margin-right:6px;">Лимит времени (сек):</label>
+        <input type="number" name="test_case_time_limit" value="1.0" step="0.1" min="0.1" style="width:80px; padding:6px; border:1px solid #ddd; border-radius:4px;">
+      </div>
+      <button type="submit" name="add_test_case" value="true" style="margin-top:10px; background:#f39c12; color:#fff; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Добавить тест-кейс</button>
+    </form>
   </div>
 
   <h2 style="margin-top:25px;">Существующие тесты</h2>

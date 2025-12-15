@@ -1,34 +1,103 @@
 {% extends 'base.html' %}
 {% load socialaccount %}
 
-{% block title %}Вход через соцсети - OnlineTest{% endblock %}
+{% block title %}Вход через Google - OnlineTest{% endblock %}
 
-{% block content %}
-<div class="container">
-  <h1>Вход через социальные сети</h1>
-  
-  {% get_providers as socialaccount_providers %}
-  
-  {% if socialaccount_providers %}
-    <p style="color:#7f8c8d; margin-bottom:20px;">Выберите способ входа:</p>
+{% block extra_css %}
+<style>
+    .oauth-container {
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
     
-    <div style="display:flex; flex-direction:column; gap:15px; max-width:400px;">
-      {% for provider in socialaccount_providers %}
-        <a href="{% provider_login_url provider.id %}" 
-           style="display:flex; align-items:center; justify-content:center; gap:10px; padding:12px 20px; background-color:#4285f4; color:white; text-decoration:none; border-radius:4px; font-weight:bold; transition:background-color 0.3s ease;">
-          Войти через {{ provider.name }}
-        </a>
-      {% endfor %}
+    .oauth-header {
+        margin-bottom: 30px;
+    }
+    
+    .oauth-header h1 {
+        font-size: 28px;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .oauth-header p {
+        color: #7f8c8d;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    .oauth-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+    
+    .oauth-button {
+        display: inline-block;
+        padding: 14px 40px;
+        background: linear-gradient(135deg, #db4437, #c5221f);
+        color: white;
+        text-decoration: none;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(219, 68, 55, 0.3);
+    }
+    
+    .oauth-button:hover {
+        background: linear-gradient(135deg, #c5221f, #a81c14);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(219, 68, 55, 0.4);
+    }
+    
+    .oauth-footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ecf0f1;
+    }
+    
+    .oauth-footer a {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .oauth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .oauth-form{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %} 
+<div class="oauth-container">
+    <div class="oauth-header">
+        <div class="oauth-icon">🔐</div>
+        <h1>Вход через Google</h1>
+        <p>Вы собираетесь войти используя аккаунт Google.</p>
     </div>
     
-    <div class="links" style="margin-top:25px;">
-      <p><a href="{% url 'users:login' %}">← Назад к обычному входу</a></p>
+    <form method="post" action="" class="oauth-form">
+        {% csrf_token %}
+        <button type="submit" class="oauth-button">
+            Продолжить с Google
+        </button>
+    </form>
+    
+    <div class="oauth-footer">
+        <p>Отмена? <a href="{% url 'users:login' %}">Вернуться на страницу входа</a></p>
     </div>
-  {% else %}
-    <p style="color:#e74c3c;">Социальные сети не настроены.</p>
-    <div class="links" style="margin-top:15px;">
-      <p><a href="{% url 'users:login' %}">← Вернуться на страницу входа</a></p>
-    </div>
-  {% endif %}
 </div>
 {% endblock %}

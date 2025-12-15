@@ -38,8 +38,9 @@
 
   <h2>Или войдите через социальные сети</h2>
   <div class="social-login" style="margin-top: 20px;">
+    {% load socialaccount %}
     <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #db4437; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; margin-right: 10px;">
-      🔵 Войти через Google
+      Войти через Google
     </a>
   </div>
 
